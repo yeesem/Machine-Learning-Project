@@ -30,7 +30,7 @@ def user_input_features():
 df = user_input_features()
 
 st.subheader('User Input Table')
-st.write(df)  y
+st.write(df) 
 
 iris = datasets.load_iris()
 x = iris.data
