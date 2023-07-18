@@ -44,4 +44,41 @@ else:
 
 # Combine user input features with entire penguins dataset
 #This will be useful for the encoding phase
-penguins_raw = pd.read_csv("")
+penguins_raw = pd.read_csv("https://raw.githubusercontent.com/dataprofessor/code/master/streamlit/part3/penguins_cleaned.csv")
+penguins = penguins_raw.drop(columns=['species'])
+df = pd.concat([input_df,penguins],axis=0)
+
+#Encoding the original features
+encode = ['sex','island']
+for col in encode:
+    dummy = pd.get_dummies(df[col],prefix=col)
+    df = pd.concat([df,dummy],axis=1)
+    del df[col]
+
+#Select only the first row (The user input data)
+df = df[:1]
+
+#Display the user input features
+st.subheader("User Input Features")
+
+if uploaded_file is not None:
+    st.write(df)
+else:
+    st.write('Awaiting CSV file to be uploaded.Currently using example input parameters(shown below)')
+    st.write(df)
+
+# Reads in saved classification model
+load_clf = pickle.load(open('penguins_clf.pkl','rb'))
+
+#Apply model to make prediction
+prediction = load_clf.predict(df)
+prediction_proba = load_clf.predict_proba(df)
+
+st.subheader('Prediction')
+penguins_species = np.array(['Adelie','Chinstrap','Gentoo'])
+st.write(penguins_species[prediction])
+
+
+st.subheader('Prediction probability')
+proba_df = pd.DataFrame(prediction_proba, columns=penguins_species)
+st.write(proba_df)
